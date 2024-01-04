@@ -1,9 +1,12 @@
 package com.dantepereyra.dailyplanner
 
-import android.annotation.SuppressLint
+import android.icu.text.SimpleDateFormat
 import android.os.Bundle
+import android.os.Message
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -11,8 +14,16 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.dantepereyra.dailyplanner.data.model.Task
+import java.util.Date
+import java.util.Locale
+import java.util.Locale.*
 
 class MainActivity : ComponentActivity() {
     private val taskViewModel = TaskViewModel()
@@ -25,38 +36,67 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
-@OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
 fun DailyPlannerApp(viewModel: TaskViewModel) {
-    var taskTitle by remember { mutableStateOf("") }
-    var taskDescription by remember { mutableStateOf("") }
+    Scaffold(viewModel = viewModel)
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun Scaffold(viewModel: TaskViewModel) {
+    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(Date())
 
     Scaffold(
         topBar = {
             TopAppBar(
+                colors = TopAppBarDefaults.largeTopAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.primary,
+                ),
                 title = { Text(text = "Daily Planner") },
                 actions = {
                     IconButton(onClick = { /*TODO*/ }) {
-                        Icon(Icons.Default.DateRange, contentDescription = "Hoy")
+                        Icon(Icons.Filled.DateRange, contentDescription = "Calendar")
                     }
                 }
             )
-        }, floatingActionButton = {
+        },
+        bottomBar = {
+            BottomAppBar(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                contentColor = MaterialTheme.colorScheme.primary
+            ) {
+
+                Text(
+                    text = currentDate,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = LocalTextStyle.current.copy(
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                )
+            }
+        },
+
+        floatingActionButton = {
             FloatingActionButton(
                 onClick = { /*TODO*/ },
-                content = { Icon(imageVector = Icons.Default.Add, contentDescription = "Agregar Tarea") }
+                content = { Icon(Icons.Filled.Add, contentDescription = "Add") }
             )
         }
     ) {
-        TaskList(viewModel)
+        TaskList(viewModel = viewModel)
     }
 }
 
 
 @Composable
 fun TaskList(viewModel: TaskViewModel) {
-    LazyColumn {
+    LazyColumn (
+    ){
         items(viewModel.taskList) { task ->
             TaskItem(task = task)
         }
@@ -65,8 +105,30 @@ fun TaskList(viewModel: TaskViewModel) {
 
 @Composable
 fun TaskItem(task: Task) {
-
+    Surface(
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+        color = MaterialTheme.colorScheme.surface
+    ) {
+        Text(text = "${task.title}, ${task.description}, ${task.duelTime}")
+    }
 }
+/*@Composable
+fun AddTask(){
+    var expanded by remember { mutableStateOf(false) }
+    val menuOptions = listOf("Add Task", "Add Event")
+    val anchorPosition = remember { mutableStateOf<IntOffset?>(null) }
+    Button(
+        onClick = {
+            expanded = true
+            anchorPosition.value = IntOffset(0, 0)
+        }) {
+        Text(text =)
+
+    }
+}*/
+
 
 @Preview(showBackground = true)
 @Composable
@@ -79,11 +141,34 @@ fun TaskListPreview() {
             Task(3, "Tarea 3", "Descripción de la tarea 3", "15:00")
         )
     )
+    LazyColumn {
+        items(viewModel.taskList) { task ->
+            TaskItem(task = task)
+        }
+    }
+    //No consigo que se muestren las tareas en el preview. Solo muestra la ultima guardada
+
     DailyPlannerApp(viewModel)
 }
 
 @Preview(showBackground = true)
 @Composable
-fun TaskItemPreview() {
-    TaskItem(Task(1, "Tarea 1", "Descripción de la tarea 1", "10:00"))
+fun TaskList(){
+    val viewModel = TaskViewModel()
+    viewModel.taskList.addAll(
+        listOf(
+            Task(1, "Tarea 1", "Descripción de la tarea 1", "10:00"),
+            Task(2, "Tarea 2", "Descripción de la tarea 2", "12:30"),
+            Task(3, "Tarea 3", "Descripción de la tarea 3", "15:00")
+        )
+    )
+    LazyColumn {
+        items(viewModel.taskList) { task ->
+            TaskItem(task = task)
+        }
+    }
 }
+
+
+
+
