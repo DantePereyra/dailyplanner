@@ -46,11 +46,12 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DailyPlannerApp(viewModel: TaskViewModel) {
-    Scaffold(viewModel = viewModel)
+    val tasks: List<Task> = viewModel.taskList
+    Scaffold(tasks)
 }
 
 @Composable
-fun Scaffold(viewModel: TaskViewModel) {
+fun Scaffold(tasks: List<Task>) {
     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(Date())
 
     Scaffold(
@@ -76,7 +77,7 @@ fun Scaffold(viewModel: TaskViewModel) {
                     .padding(innerPadding)
 
             ) {
-                TaskList(viewModel = viewModel)
+                TaskList(tasks)
             }
 
             BackgroundImage()
@@ -148,11 +149,11 @@ fun BackgroundImage() {
 }
 
 @Composable
-fun TaskList(viewModel: TaskViewModel) {
+fun TaskList(tasks: List<Task>) {
     LazyColumn(
 
     ) {
-        items(viewModel.taskList) { task ->
+        items(tasks) { task ->
             TaskItem(task = task)
         }
     }
@@ -184,7 +185,7 @@ fun DailyPlannerAppPreview() {
             Task(3, "Tarea 3", "Descripción de la tarea 3", "15:00")
         )
     )
-    //No consigo que se muestren las tareas en el preview. Solo muestra la ultima guardada
+
     DailyPlannerApp(viewModel)
 }
 
