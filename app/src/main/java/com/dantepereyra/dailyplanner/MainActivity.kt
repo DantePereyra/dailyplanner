@@ -2,18 +2,17 @@
 
 package com.dantepereyra.dailyplanner
 
+import android.app.Application
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -25,69 +24,68 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.dantepereyra.dailyplanner.data.model.Task
 import java.util.Date
 import java.util.Locale
 import java.util.Locale.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.navigation.NavController
+import androidx.navigation.Navigation
+import androidx.navigation.compose.rememberNavController
+import com.dantepereyra.dailyplanner.features.addtask.navigateToAddTaskScreen
+import com.dantepereyra.dailyplanner.features.task.Task
+import com.dantepereyra.dailyplanner.features.task.TaskViewModel
+import com.dantepereyra.dailyplanner.navigation.Navigation
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.HiltAndroidApp
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val taskViewModel = TaskViewModel()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            DailyPlannerApp(taskViewModel)
+            val navController = rememberNavController()
+            DailyPlannerApp(navController = navController)
         }
     }
 }
-
+@Preview
 @Composable
-fun DailyPlannerApp(viewModel: TaskViewModel) {
-    val tasks: List<Task> = viewModel.taskList
-    Scaffold(tasks)
-}
-
-@Composable
-fun Scaffold(tasks: List<Task>) {
+fun DailyPlannerApp(navController: NavController) {
     val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(Date())
 
     Scaffold(
         topBar = {
-            TopAppBar()
+            DailyTopAppBar()
         },
         bottomBar = {
-            BottomAppBar(currentDate)
+            DailyBottomAppBar(currentDate)
         },
 
         floatingActionButton = {
             FloatingActionButton(
-                onClick = { /*TODO*/ },
+                onClick = { navController.navigateToAddTaskScreen() },
                 content = { Icon(Icons.Filled.Add, contentDescription = "Add") }
             )
         }
     ) { innerPadding ->
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Box(
-                modifier = Modifier
-                    .padding(innerPadding)
-
-            ) {
-                TaskList(tasks)
+        Box() {
+            Box(modifier = Modifier.padding(innerPadding)) {
+                Navigation(modifier = Modifier.padding(innerPadding))
             }
-
-            BackgroundImage()
         }
-
+        BackgroundImage()
     }
+
 }
 
+
 @Composable
-fun TopAppBar() {
+fun DailyTopAppBar() {
     TopAppBar(
         colors = TopAppBarDefaults.largeTopAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -103,7 +101,7 @@ fun TopAppBar() {
 }
 
 @Composable
-fun BottomAppBar(currentDate: String) {
+fun DailyBottomAppBar(currentDate: String) {
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.primary
@@ -121,20 +119,6 @@ fun BottomAppBar(currentDate: String) {
     }
 }
 
-/*@Composable
-fun AddTask(){
-    var expanded by remember { mutableStateOf(false) }
-    val menuOptions = listOf("Add Task", "Add Event")
-    val anchorPosition = remember { mutableStateOf<IntOffset?>(null) }
-    Button(
-        onClick = {
-            expanded = true
-            anchorPosition.value = IntOffset(0, 0)
-        }) {
-        Text(text =)
-
-    }
-}*/
 
 @Composable
 fun BackgroundImage() {
@@ -148,65 +132,6 @@ fun BackgroundImage() {
     )
 }
 
-@Composable
-fun TaskList(tasks: List<Task>) {
-    LazyColumn(
 
-    ) {
-        items(tasks) { task ->
-            TaskItem(task = task)
-        }
-    }
-}
-
-@Composable
-fun TaskItem(task: Task) {
-    Surface(
-        modifier = Modifier.padding(8.dp),
-        color = MaterialTheme.colorScheme.surface,
-            ) {
-        Text(
-            text = "${task.title}, ${task.description}, ${task.duelTime}",
-            fontSize = 20.sp,
-
-        )
-    }
-}
-
-
-@Preview(showBackground = true)
-@Composable
-fun DailyPlannerAppPreview() {
-    val viewModel = TaskViewModel()
-    viewModel.taskList.addAll(
-        listOf(
-            Task(1, "Tarea 1", "Descripción de la tarea 1", "10:00"),
-            Task(2, "Tarea 2", "Descripción de la tarea 2", "12:30"),
-            Task(3, "Tarea 3", "Descripción de la tarea 3", "15:00")
-        )
-    )
-
-    DailyPlannerApp(viewModel)
-}
-
-@Preview(showBackground = true)
-@Composable
-fun TaskList() {
-    val viewModel = TaskViewModel()
-    viewModel.taskList.addAll(
-        listOf(
-            Task(1, "Tarea 1", "Descripción de la tarea 1", "10:00"),
-            Task(2, "Tarea 2", "Descripción de la tarea 2", "12:30"),
-            Task(3, "Tarea 3", "Descripción de la tarea 3", "15:00")
-        )
-    )
-    LazyColumn {
-        items(viewModel.taskList) { task ->
-            TaskItem(task = task)
-        }
-    }
-}
-
-
-
-
+@HiltAndroidApp
+class DailyPlannerAplication : Application()
