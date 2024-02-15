@@ -7,7 +7,7 @@ import androidx.room.Query
 
 @Dao
 interface TaskDAO {
-    @Query(" SELECT * FROM PilaEntity ")
+    @Query(" SELECT * FROM TaskEntity ")
     fun getAll(): List<TaskEntity>
 
     @Insert

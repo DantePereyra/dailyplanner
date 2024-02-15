@@ -3,6 +3,7 @@
 package com.dantepereyra.dailyplanner
 
 import android.app.Application
+import android.content.Context
 import android.icu.text.SimpleDateFormat
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -34,8 +35,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.Navigation
 import androidx.navigation.compose.rememberNavController
+import com.dantepereyra.dailyplanner.bd.TaskDBHelper
+import com.dantepereyra.dailyplanner.bd.TaskDBScheme
+import com.dantepereyra.dailyplanner.domain.Task
 import com.dantepereyra.dailyplanner.features.addtask.navigateToAddTaskScreen
 import com.dantepereyra.dailyplanner.features.task.Task
+import com.dantepereyra.dailyplanner.features.task.TaskRepository
 import com.dantepereyra.dailyplanner.features.task.TaskViewModel
 import com.dantepereyra.dailyplanner.navigation.Navigation
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,15 +49,25 @@ import dagger.hilt.android.HiltAndroidApp
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val dbHelper = TaskDBHelper(this)
+        val writableDB = dbHelper.readableDatabase
+        writableDB.execSQL(
+            """
+            INSERT INTO ${TaskDBScheme.TABLE_NAME}
+            VALUES ('Cocinar','Preparar estofado verduras')
+        """.trimIndent()
+        )
+
+
         setContent {
             val navController = rememberNavController()
             DailyPlannerApp(navController = navController)
         }
     }
 }
+
 @Preview
 @Composable
 fun DailyPlannerApp(navController: NavController) {
