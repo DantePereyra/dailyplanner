@@ -1,9 +1,11 @@
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
-
+    /* Kapt, Dagger Hilt*/
     kotlin("kapt")
     id("com.google.dagger.hilt.android")
+    /* Ksp */
+    id("com.google.devtools.ksp")
 }
 
 android {
@@ -61,8 +63,16 @@ dependencies {
     /* Implementacion de HILT */
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation("com.google.dagger:hilt-android:2.44")
-
     kapt("com.google.dagger:hilt-android-compiler:2.44")
+
+    /* Implementacion de Room */
+    val room_version = "2.5.0"
+    implementation("androidx.room:room-runtime:$room_version")
+    annotationProcessor("androidx.room:room-compiler:$room_version")
+
+    /* Implemnentacion KSP */
+
+    ksp("androidx.room:room-compiler:$room_version")
 
     implementation("androidx.core:core-ktx:1.9.0")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
