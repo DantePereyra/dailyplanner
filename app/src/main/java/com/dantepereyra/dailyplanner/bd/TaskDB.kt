@@ -12,10 +12,10 @@ object TaskDBScheme: BaseColumns {
 const val SQL_CREATE_ENTRIES = """
 CREATE TABLE ${TaskDBScheme.TABLE_NAME}(
 ${TaskDBScheme.COLUMN_NAME} TEXT PRIMARY KEY,
-${TaskDBScheme.COLUMN_DESCRIPTION} TEXT,
+${TaskDBScheme.COLUMN_DESCRIPTION} TEXT
 
 )
 """
 
-private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXIST ${TaskDBScheme.TABLE_NAME}"
+private const val SQL_DELETE_ENTRIES = "DROP TABLE IF EXISTS ${TaskDBScheme.TABLE_NAME}"
 

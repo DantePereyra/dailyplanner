@@ -1,7 +1,9 @@
 package com.dantepereyra.dailyplanner.di
 
 import android.content.Context
+import android.database.sqlite.SQLiteDatabase
 import androidx.room.Room
+import com.dantepereyra.dailyplanner.bd.TaskDBHelper
 import com.dantepereyra.dailyplanner.bd.taskDB.TaskDBRoom
 import dagger.Module
 import dagger.Provides
@@ -13,9 +15,10 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 @InstallIn(ViewModelComponent::class)
 object TaskDBModule {
 
-    //   @Provides
-    //   fun providesTaskDBHelper(@ApplicationContext context: Context): SQLiteDatabase {
-    //       return TaskDBHelper(context).writableDatabase
+    @Provides
+    fun providesTaskDBHelper(@ApplicationContext context: Context): SQLiteDatabase {
+        return TaskDBHelper(context).writableDatabase
+    }
 
 
     const val DATABASE_NAME = "TasksRoom.db"

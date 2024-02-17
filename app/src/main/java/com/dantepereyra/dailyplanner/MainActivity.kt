@@ -51,14 +51,14 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val dbHelper = TaskDBHelper(this)
-        val writableDB = dbHelper.readableDatabase
-        writableDB.execSQL(
-            """
-            INSERT INTO ${TaskDBScheme.TABLE_NAME}
-            VALUES ('Cocinar','Preparar estofado verduras')
-        """.trimIndent()
-        )
+//        val dbHelper = TaskDBHelper(this)
+//        val writableDB = dbHelper.readableDatabase
+//        writableDB.execSQL(
+//            """
+//            INSERT INTO ${TaskDBScheme.TABLE_NAME}
+//            VALUES ('Cocinar','Preparar estofado verduras')
+//        """.trimIndent()
+//        )
 
 
         setContent {
@@ -71,31 +71,7 @@ class MainActivity : ComponentActivity() {
 @Preview
 @Composable
 fun DailyPlannerApp(navController: NavController) {
-    val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(Date())
-
-    Scaffold(
-        topBar = {
-            DailyTopAppBar()
-        },
-        bottomBar = {
-            DailyBottomAppBar(currentDate)
-        },
-
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = { navController.navigateToAddTaskScreen() },
-                content = { Icon(Icons.Filled.Add, contentDescription = "Add") }
-            )
-        }
-    ) { innerPadding ->
-        Box() {
-            Box(modifier = Modifier.padding(innerPadding)) {
-                Navigation(modifier = Modifier.padding(innerPadding))
-            }
-        }
-        BackgroundImage()
-    }
-
+    Navigation()
 }
 
 
@@ -147,6 +123,3 @@ fun BackgroundImage() {
     )
 }
 
-
-@HiltAndroidApp
-class DailyPlannerAplication : Application()

@@ -7,11 +7,11 @@ import androidx.navigation.compose.composable
 import com.dantepereyra.dailyplanner.features.addtask.navigateToAddTaskScreen
 
 
-val ROUTE="task_screen"
+val ROUTE_TASK="task_screen"
 fun NavController.navigateToTaskScreen(){
-    navigate(ROUTE)
+    navigate(ROUTE_TASK)
 }
 
 fun NavGraphBuilder.taskScreen(navController: NavHostController){
-    composable(ROUTE) { TaskScreen(navigateToAddTask = {navController.navigateToAddTaskScreen()}) }
+    composable(ROUTE_TASK) { TaskScreen(navigateToAddTask = {navController.navigateToAddTaskScreen()}) }
 }
