@@ -15,6 +15,13 @@ class TaskRepository @Inject constructor(
 ) {
     fun getTasksDao(): List<Task> = taskDAO.getAll().map { it.toDomain() }
     fun saveTaskDao(task: Task) = taskDAO.insertAll(task.toEntity())
+    fun markTaskAsCompleted(id: Long) {
+
+    }
+
+    fun deleteTask(id: Long) {
+
+    }
 
     /******* Acceso a base de datos "manual" **********/
     fun getTasksSQLite(): List<Task> {
@@ -22,8 +29,10 @@ class TaskRepository @Inject constructor(
         val cursor = writableDB.query(
             TaskDBScheme.TABLE_NAME,
             arrayOf(
-                TaskDBScheme.COLUMN_NAME,
-                TaskDBScheme.COLUMN_DESCRIPTION
+                TaskDBScheme.COLUMN_ID,
+                TaskDBScheme.COLUMN_DESCRIPTION,
+                TaskDBScheme.COLUMN_IS_COMPLETED,
+                TaskDBScheme.COLUMN_DATE
             ),
             null, null, null, null, null
         )
@@ -31,8 +40,10 @@ class TaskRepository @Inject constructor(
             while (moveToNext()) {
                 tasks.add(
                     Task(
-                        tittle = getString(getColumnIndexOrThrow(TaskDBScheme.COLUMN_NAME)),
-                        description = getString(getColumnIndexOrThrow(TaskDBScheme.COLUMN_DESCRIPTION))
+                        id = getLong(getColumnIndexOrThrow(TaskDBScheme.COLUMN_ID)),
+                        description = getString(getColumnIndexOrThrow(TaskDBScheme.COLUMN_DESCRIPTION)),
+                        isCompleted = getInt(getColumnIndexOrThrow(TaskDBScheme.COLUMN_IS_COMPLETED)) == 1,
+                        date = getLong(getColumnIndexOrThrow(TaskDBScheme.COLUMN_DATE))
                     )
                 )
                 close()
@@ -41,13 +52,15 @@ class TaskRepository @Inject constructor(
         return tasks.toList()
     }
 
-    /****** Guardar pilas mediante DBHelper ********/
+    /****** Guardar tareas mediante DBHelper ********/
     fun saveTaskSQLite(task: Task){
         val values = ContentValues().apply {
-            put(TaskDBScheme.COLUMN_NAME,task.tittle)
             put(TaskDBScheme.COLUMN_DESCRIPTION, task.description)
+            put(TaskDBScheme.COLUMN_IS_COMPLETED, if (task.isCompleted) 1 else 0)
+            put(TaskDBScheme.COLUMN_DATE, task.date)
         }
-        writableDB.insert(TaskDBScheme.TABLE_NAME,null,values)
+        writableDB.insert(TaskDBScheme.TABLE_NAME, null, values)
     }
+
 
 }

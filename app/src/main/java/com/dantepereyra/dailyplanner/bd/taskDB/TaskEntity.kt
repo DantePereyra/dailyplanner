@@ -10,12 +10,16 @@ import com.dantepereyra.dailyplanner.domain.Task
 @Entity
 class TaskEntity(
 
-    @PrimaryKey val tittle: String,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
     @ColumnInfo(name = "description") val description: String,
+    @ColumnInfo(name = "is_Completed") var isCompleted: Boolean = false,
+    @ColumnInfo(name = "date") val date: Long,
 
     )
 fun TaskEntity.toDomain() = Task(
-    tittle  = tittle,
-    description = description
+    id  = id,
+    description = description,
+    isCompleted = isCompleted,
+    date = date
 
 )

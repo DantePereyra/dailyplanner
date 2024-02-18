@@ -26,8 +26,9 @@ object TaskDBModule {
     @Provides
     fun providesTaskDbRoom(@ApplicationContext context: Context) = Room.databaseBuilder(
         context,
-        TaskDBRoom::class.java, DATABASE_NAME
-    ).build()
+        TaskDBRoom::class.java, DATABASE_NAME)
+        .fallbackToDestructiveMigration()
+        .build()
 
     @Provides
     fun providesTaskDao(taskDBRoom: TaskDBRoom) = taskDBRoom.taskDao()

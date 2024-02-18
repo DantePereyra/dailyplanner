@@ -25,6 +25,29 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
+    fun markTaskAsCompleted(task: Task) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                repository.markTaskAsCompleted(task.id)
+
+                _state.value = repository.getTasksDao()
+            }
+        }
+    }
+    fun deleteTask(task: Task) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                repository.deleteTask(task.id)
+                // Actualizar el estado con la lista de tareas actualizada
+                _state.value = repository.getTasksDao()
+            }
+        }
+    }
+    fun editTask(task: Task) {
+        // Implementar la lógica para editar una tarea
+        // abriendo una pantalla nueva
+    }
+
 
 }
 

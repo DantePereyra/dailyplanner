@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalMaterial3Api::class)
+@file:OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterial3Api::class)
 
 package com.dantepereyra.dailyplanner.features.addtask
 
@@ -21,13 +21,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.dantepereyra.dailyplanner.BackgroundImage
-import com.dantepereyra.dailyplanner.DailyBottomAppBar
-import com.dantepereyra.dailyplanner.DailyTopAppBar
 import com.dantepereyra.dailyplanner.domain.Task
+import com.dantepereyra.dailyplanner.features.task.BackgroundImage
+import com.dantepereyra.dailyplanner.features.task.DailyBottomAppBar
+import com.dantepereyra.dailyplanner.features.task.DailyTopAppBar
 import com.dantepereyra.dailyplanner.features.task.currentDate
 
-@OptIn(ExperimentalMaterial3Api::class)
+
 
 @Composable
 fun AddTaskScreen(viewModel: AddTaskViewmodel = hiltViewModel(),
@@ -82,7 +82,7 @@ fun AddTaskContent(
                 // Botón para agregar la tarea
                 Button(onClick = {
 
-                    addTask(Task(name.text,description.text))
+                   // addTask(Task(name.text,description.text))
                     name = TextFieldValue()
                     description = TextFieldValue()
                     navigateToTaskScren()

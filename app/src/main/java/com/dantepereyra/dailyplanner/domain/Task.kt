@@ -3,11 +3,15 @@ package com.dantepereyra.dailyplanner.domain
 import com.dantepereyra.dailyplanner.bd.taskDB.TaskEntity
 
 data class Task(
-    val tittle: String,
+    val id: Long,
     val description: String,
+    var isCompleted: Boolean = false,
+    val date: Long
 )
 
 fun Task.toEntity() = TaskEntity(
-    tittle = tittle,
-    description = description
+    id  = id,
+    description = description,
+    isCompleted = isCompleted,
+    date = date
 )

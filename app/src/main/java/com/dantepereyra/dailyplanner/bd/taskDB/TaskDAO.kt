@@ -15,4 +15,7 @@ interface TaskDAO {
 
     @Delete
     fun delete(task: TaskEntity)
+
+    @Query("SELECT * FROM TaskEntity WHERE date = :date")
+    fun getTasksByDate(date: Long): List<TaskEntity>
 }

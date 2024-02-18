@@ -39,7 +39,6 @@ import com.dantepereyra.dailyplanner.bd.TaskDBHelper
 import com.dantepereyra.dailyplanner.bd.TaskDBScheme
 import com.dantepereyra.dailyplanner.domain.Task
 import com.dantepereyra.dailyplanner.features.addtask.navigateToAddTaskScreen
-import com.dantepereyra.dailyplanner.features.task.Task
 import com.dantepereyra.dailyplanner.features.task.TaskRepository
 import com.dantepereyra.dailyplanner.features.task.TaskViewModel
 import com.dantepereyra.dailyplanner.navigation.Navigation
@@ -51,16 +50,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-//        val dbHelper = TaskDBHelper(this)
-//        val writableDB = dbHelper.readableDatabase
-//        writableDB.execSQL(
-//            """
-//            INSERT INTO ${TaskDBScheme.TABLE_NAME}
-//            VALUES ('Cocinar','Preparar estofado verduras')
-//        """.trimIndent()
-//        )
-
-
         setContent {
             val navController = rememberNavController()
             DailyPlannerApp(navController = navController)
@@ -68,58 +57,8 @@ class MainActivity : ComponentActivity() {
     }
 }
 
-@Preview
 @Composable
 fun DailyPlannerApp(navController: NavController) {
     Navigation()
-}
-
-
-@Composable
-fun DailyTopAppBar() {
-    TopAppBar(
-        colors = TopAppBarDefaults.largeTopAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.primary,
-        ),
-        title = { Text(text = "Daily Planner") },
-        actions = {
-            IconButton(onClick = { /*TODO*/ }) {
-                Icon(Icons.Filled.DateRange, contentDescription = "Calendar")
-            }
-        }
-    )
-}
-
-@Composable
-fun DailyBottomAppBar(currentDate: String) {
-    BottomAppBar(
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = MaterialTheme.colorScheme.primary
-    ) {
-
-        Text(
-            text = currentDate,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = LocalTextStyle.current.copy(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        )
-    }
-}
-
-
-@Composable
-fun BackgroundImage() {
-    val image = painterResource(id = R.drawable.background)
-    Image(
-        painter = image,
-        contentDescription = null,
-        modifier = Modifier
-            .fillMaxSize()
-            .alpha(0.3f)
-    )
 }
 
