@@ -66,12 +66,6 @@ fun AddTaskContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-                TextField(
-                    value = name ,
-                    onValueChange = { name = it },
-                    placeholder = { Text("Nombre") }
-                )
-
 
                 TextField(
                     value = description,
@@ -82,7 +76,7 @@ fun AddTaskContent(
                 // Botón para agregar la tarea
                 Button(onClick = {
 
-                   // addTask(Task(name.text,description.text))
+                  // addTask(Task(description.text, currentDate))
                     name = TextFieldValue()
                     description = TextFieldValue()
                     navigateToTaskScren()

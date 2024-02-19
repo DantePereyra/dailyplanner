@@ -21,7 +21,8 @@ class TaskViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                _state.value = repository.getTasksDao()
+                //_state.value = repository.getTasksDao()
+                 repository.getCatFacts()
             }
         }
     }
@@ -47,6 +48,8 @@ class TaskViewModel @Inject constructor(
         // Implementar la lógica para editar una tarea
         // abriendo una pantalla nueva
     }
+
+
 
 
 }
