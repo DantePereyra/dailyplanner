@@ -50,39 +50,14 @@ class TaskRepository @Inject constructor(
         taskDAO.getTasksByID(id)
     }
 
-    suspend fun getCatFacts() {
-        withContext(Dispatchers.IO) {
+    suspend fun getCatFacts(): String {
+        return withContext(Dispatchers.IO) {
 
             val fact: FactResponse = api.getCatFact().await()
-            Log.d("TaskRepository", "getCatFacts: $fact")
+            fact.text
         }
     }
 
-    @Composable
-    fun windowFact(catFact: String) {
-        val showDialog = remember { mutableStateOf(false) }
-        showDialog.value = true
-        if (showDialog.value) {
-            AlertDialog(
-                onDismissRequest = { showDialog.value = false },
-                title = {
-                    Text(text = "Cat Fact")
-                },
-                text = {
-                    Text(text = catFact)
-                },
-                confirmButton = {
-                    Button(
-                        onClick = { showDialog.value = false },
-                        colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
-                    ) {
-                        Text(text = "Ok")
-                    }
-                }
-            )
-        }
-
-    }
 
     /******* Acceso a base de datos "manual" **********/
     fun getTasksSQLite(): List<Task> {

@@ -66,7 +66,6 @@ fun AddTaskContent(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
 
-
                 TextField(
                     value = description,
                     onValueChange = { description = it },

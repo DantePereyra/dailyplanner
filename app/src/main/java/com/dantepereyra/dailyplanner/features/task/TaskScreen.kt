@@ -49,6 +49,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.dantepereyra.dailyplanner.R
+import com.dantepereyra.dailyplanner.api.FactResponse
 import com.dantepereyra.dailyplanner.domain.Task
 import java.util.Date
 import java.util.Locale
@@ -70,6 +71,8 @@ fun TaskScreen(
     val onEditClick: (Task) -> Unit = { task ->
         viewModel.editTask(task)
     }
+    //Sacar el catFact del viewmodel
+
     TaskContent(
         state.value,
         navigateToAddTask = navigateToAddTask,
@@ -86,7 +89,8 @@ fun TaskContent(
     navigateToAddTask: () -> Unit,
     onCompletedClick: (Task) -> Unit,
     onDeleteClick: (Task) -> Unit,
-    onEditClick: (Task) -> Unit
+    onEditClick: (Task) -> Unit,
+    catFact:String = "Probando"
 ) {
 
 
@@ -107,15 +111,47 @@ fun TaskContent(
     ) { innerPadding ->
 
         Box(modifier = Modifier.padding(innerPadding)) {
+            val showDialog = remember { mutableStateOf(false) }
+            showDialog.value = true
+            if (showDialog.value) {
+                WindowFact(catFact = catFact,
+                    onWindowClose={ showDialog.value = false }
+                )
+            }
             TasksList(
                 tasks = state,
                 onCompletedClick = onCompletedClick,
                 onDeleteClick = onDeleteClick,
                 onEditClick = onEditClick
             )
+
         }
         BackgroundImage()
     }
+}
+
+@Composable
+fun WindowFact(catFact: String,
+onWindowClose: () ->Unit
+) {
+
+    AlertDialog(
+        onDismissRequest =onWindowClose ,
+        title = {
+            Text(text = "Cat Fact")
+        },
+        text = {
+            Text(text = catFact)
+        },
+        confirmButton = {
+            Button(
+                onClick = onWindowClose,
+                colors = ButtonDefaults.buttonColors(containerColor = Color.Gray)
+            ) {
+                Text(text = "Ok")
+            }
+        }
+    )
 }
 
 @Composable
@@ -186,7 +222,10 @@ fun DailyTopAppBar() {
             IconButton(onClick = { /*TODO*/ }) {
                 Icon(Icons.Filled.DateRange, contentDescription = "Calendar")
             }
-            IconButton(onClick = {          }) {
+
+            IconButton(onClick = { /*Aqui es donde quiero que abra la ventana de gatos*/ ) {
+
+            }}) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = "Cat Fact")
             }
         }
