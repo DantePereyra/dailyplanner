@@ -13,6 +13,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,37 +25,40 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.dantepereyra.dailyplanner.domain.Task
 import com.dantepereyra.dailyplanner.features.task.BackgroundImage
 import com.dantepereyra.dailyplanner.features.task.DailyBottomAppBar
-import com.dantepereyra.dailyplanner.features.task.DailyTopAppBar
-import com.dantepereyra.dailyplanner.features.task.currentDate
-
 
 
 @Composable
-fun AddTaskScreen(viewModel: AddTaskViewmodel = hiltViewModel(),
-        navigateToTaskScren: () -> Unit
+fun AddTaskScreen(
+    viewModel: AddTaskViewmodel = hiltViewModel(),
+    navigateToTaskScren: () -> Unit,
 ) {
+
+
     AddTaskContent(
         addTask = {
             viewModel.saveTask(it)
         },
-        navigateToTaskScren = navigateToTaskScren
+        navigateToTaskScren = navigateToTaskScren,
+
     )
 }
 
 @Composable
 fun AddTaskContent(
     addTask: (Task) -> Unit,
-    navigateToTaskScren: () -> Unit
+    navigateToTaskScren: () -> Unit,
+
+
 ) {
     var name by remember { mutableStateOf(TextFieldValue()) }
     var description by remember { mutableStateOf(TextFieldValue()) }
 
     Scaffold(
         topBar = {
-            DailyTopAppBar()
+
         },
         bottomBar = {
-            DailyBottomAppBar(currentDate)
+            DailyBottomAppBar()
         },
 
         ) { innerPadding ->
@@ -69,13 +73,13 @@ fun AddTaskContent(
                 TextField(
                     value = description,
                     onValueChange = { description = it },
-                    placeholder = { Text("Descripción") }
+                    placeholder = { Text("Tarea") }
                 )
 
                 // Botón para agregar la tarea
                 Button(onClick = {
 
-                  // addTask(Task(description.text, currentDate))
+                   // addTask(Task(description.text, currentDate))
                     name = TextFieldValue()
                     description = TextFieldValue()
                     navigateToTaskScren()

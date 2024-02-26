@@ -2,7 +2,11 @@
 
 package com.dantepereyra.dailyplanner.features.task
 
+import android.annotation.SuppressLint
+import android.app.DatePickerDialog
+import android.content.Context
 import android.icu.text.SimpleDateFormat
+import android.preference.PreferenceManager
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -35,27 +39,38 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
+
 import com.dantepereyra.dailyplanner.R
-import com.dantepereyra.dailyplanner.api.FactResponse
+import com.dantepereyra.dailyplanner.domain.SharedViewModel
 import com.dantepereyra.dailyplanner.domain.Task
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
-val currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(Date())
 
+@SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun TaskScreen(
     viewModel: TaskViewModel = hiltViewModel(),
@@ -71,14 +86,27 @@ fun TaskScreen(
     val onEditClick: (Task) -> Unit = { task ->
         viewModel.editTask(task)
     }
-    //Sacar el catFact del viewmodel
+    val showCatFactDialog = remember { mutableStateOf(false) }
+    var catFact: String = ""
+    val onCatFactClick: () -> Unit = {
+        showCatFactDialog.value = true
+    }
+    GlobalScope.launch {
+        withContext(Dispatchers.IO) {
+            catFact = viewModel.getCatFact()
+
+        }
+    }
 
     TaskContent(
         state.value,
         navigateToAddTask = navigateToAddTask,
         onCompletedClick = onCompletedClick,
         onDeleteClick = onDeleteClick,
-        onEditClick = onEditClick
+        onEditClick = onEditClick,
+        catFact = catFact,
+        showCatFactDialog = showCatFactDialog, // Pasa el estado al contenido
+        onCatFactClick = onCatFactClick // Pasa la acción para abrir el dialogo
 
     )
 }
@@ -90,16 +118,22 @@ fun TaskContent(
     onCompletedClick: (Task) -> Unit,
     onDeleteClick: (Task) -> Unit,
     onEditClick: (Task) -> Unit,
-    catFact:String = "Probando"
+    catFact: String,
+    showCatFactDialog: MutableState<Boolean>,
+    onCatFactClick: () -> Unit
 ) {
-
 
     Scaffold(
         topBar = {
-            DailyTopAppBar()
+            DailyTopAppBar(onCatFactClick = onCatFactClick)
+            if (showCatFactDialog.value) {
+                WindowFact(catFact = catFact) {
+                    showCatFactDialog.value = false // Cambia el estado para cerrar el dialogo
+                }
+            }
         },
         bottomBar = {
-            DailyBottomAppBar(currentDate)
+            DailyBottomAppBar()
         },
 
         floatingActionButton = {
@@ -111,13 +145,7 @@ fun TaskContent(
     ) { innerPadding ->
 
         Box(modifier = Modifier.padding(innerPadding)) {
-            val showDialog = remember { mutableStateOf(false) }
-            showDialog.value = true
-            if (showDialog.value) {
-                WindowFact(catFact = catFact,
-                    onWindowClose={ showDialog.value = false }
-                )
-            }
+
             TasksList(
                 tasks = state,
                 onCompletedClick = onCompletedClick,
@@ -131,12 +159,13 @@ fun TaskContent(
 }
 
 @Composable
-fun WindowFact(catFact: String,
-onWindowClose: () ->Unit
+fun WindowFact(
+    catFact: String,
+    onWindowClose: () -> Unit
 ) {
 
     AlertDialog(
-        onDismissRequest =onWindowClose ,
+        onDismissRequest = onWindowClose,
         title = {
             Text(text = "Cat Fact")
         },
@@ -209,7 +238,39 @@ fun TaskItem(
 
 
 @Composable
-fun DailyTopAppBar() {
+fun DailyTopAppBar(onCatFactClick: () -> Unit) {
+
+    val context = LocalContext.current
+    var currentDate by remember {
+        mutableStateOf(
+            SimpleDateFormat(
+                "dd/MM/yyyy",
+                Locale.ENGLISH
+            ).format(Date())
+        )
+    }
+    val showDatePickerDialog = remember { mutableStateOf(false) }
+
+    if (showDatePickerDialog.value) {
+
+        val yearMonthDay = currentDate.split("/").map { it.toInt() }
+        DatePickerDialog(
+            context,
+            { _, year, month, dayOfMonth ->
+                val cal = Calendar.getInstance().apply {
+                    set(year, month, dayOfMonth)
+                }
+                currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(cal.time)
+
+                saveDateInSharedPreferences(context, currentDate)
+                showDatePickerDialog.value = false
+            },
+            yearMonthDay[2], // Año
+            yearMonthDay[1] - 1, // Mes (El mes comienza desde 0)
+            yearMonthDay[0] // Día
+        ).show()
+    }
+
     val showDialog = remember { mutableStateOf(false) }
     showDialog.value = true
     TopAppBar(
@@ -219,13 +280,11 @@ fun DailyTopAppBar() {
         ),
         title = { Text(text = "Daily Planner") },
         actions = {
-            IconButton(onClick = { /*TODO*/ }) {
+            IconButton(onClick = { showDatePickerDialog.value = true }) {
                 Icon(Icons.Filled.DateRange, contentDescription = "Calendar")
             }
 
-            IconButton(onClick = { /*Aqui es donde quiero que abra la ventana de gatos*/ ) {
-
-            }}) {
+            IconButton(onClick = { onCatFactClick }) {
                 Icon(Icons.Filled.PlayArrow, contentDescription = "Cat Fact")
             }
         }
@@ -233,21 +292,27 @@ fun DailyTopAppBar() {
 }
 
 @Composable
-fun DailyBottomAppBar(currentDate: String) {
+fun DailyBottomAppBar(viewModel: SharedViewModel = hiltViewModel()) {
+    val context = LocalContext.current
+
+    val currentDate = viewModel.selectedDate.collectAsState()
+
     BottomAppBar(
         containerColor = MaterialTheme.colorScheme.primaryContainer,
         contentColor = MaterialTheme.colorScheme.primary
     ) {
 
-        Text(
-            text = currentDate,
-            modifier = Modifier.fillMaxWidth(),
-            textAlign = TextAlign.Center,
-            style = LocalTextStyle.current.copy(
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+        currentDate.value?.let {
+            Text(
+                text = it,
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                style = LocalTextStyle.current.copy(
+                    fontSize = 24.sp,
+                    fontWeight = FontWeight.Bold
+                )
             )
-        )
+        }
     }
 }
 
@@ -262,5 +327,21 @@ fun BackgroundImage() {
             .fillMaxSize()
             .alpha(0.3f)
     )
+}
+
+fun saveDateInSharedPreferences(context: Context, date: String) {
+    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    with(sharedPreferences.edit()) {
+        putString("selectedDate", date)
+        apply()
+    }
+}
+
+fun getDateFromSharedPreferences(context: Context): String {
+    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+
+    val storedDate = sharedPreferences.getString("selectedDate", null)
+
+    return storedDate ?: SimpleDateFormat("dd/MM/yyyy", Locale.US).format(Date())
 }
 

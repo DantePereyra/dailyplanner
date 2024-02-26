@@ -49,8 +49,8 @@ class TaskViewModel @Inject constructor(
         // abriendo una pantalla nueva
     }
 
-    suspend fun getCatFact(){
-        repository.getCatFacts()
+    suspend fun getCatFact():String{
+        return repository.getCatFacts()
     }
 
 

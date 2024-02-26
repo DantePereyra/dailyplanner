@@ -8,9 +8,12 @@ import com.dantepereyra.dailyplanner.features.task.navigateToTaskScreen
 
 val ROUTE_ADD_TASK = "add_task_screen"
 fun NavController.navigateToAddTaskScreen() {
-    navigate(ROUTE_ADD_TASK)
+    navigate(ROUTE_ADD_TASK){
+
+    }
 }
 
 fun NavGraphBuilder.addTaskScreen(navController: NavHostController) {
-    composable(ROUTE_ADD_TASK) { AddTaskScreen(navigateToTaskScren = { navController.navigateToTaskScreen() }) }
+    composable(ROUTE_ADD_TASK) {
+        AddTaskScreen(navigateToTaskScren = { navController.navigateToTaskScreen() }) }
 }
