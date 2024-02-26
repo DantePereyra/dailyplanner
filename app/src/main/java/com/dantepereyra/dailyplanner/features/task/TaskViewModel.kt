@@ -2,7 +2,10 @@ package com.dantepereyra.dailyplanner.features.task
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.dantepereyra.dailyplanner.bd.taskDB.TaskEntity
+import com.dantepereyra.dailyplanner.domain.DateRepository
 import com.dantepereyra.dailyplanner.domain.Task
+import com.dantepereyra.dailyplanner.domain.toEntity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +16,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class TaskViewModel @Inject constructor(
-    private val repository: TaskRepository
+    private val repository: TaskRepository,
+    private val dateRepository: DateRepository
 ) : ViewModel() {
     private var _state = MutableStateFlow(emptyList<Task>())
     val state: StateFlow<List<Task>> = _state
@@ -26,6 +30,7 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
+
     fun markTaskAsCompleted(task: Task) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -35,6 +40,7 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
+
     fun deleteTask(task: Task) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
@@ -44,16 +50,19 @@ class TaskViewModel @Inject constructor(
             }
         }
     }
+
     fun editTask(task: Task) {
         // Implementar la lógica para editar una tarea
         // abriendo una pantalla nueva
     }
 
-    suspend fun getCatFact():String{
+    suspend fun getCatFact(): String {
         return repository.getCatFacts()
     }
 
-
+    fun onDateSelected(date: String) {
+        dateRepository.saveSelectedDate(date)
+    }
 
 
 }

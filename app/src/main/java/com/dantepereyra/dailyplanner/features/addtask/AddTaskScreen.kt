@@ -79,7 +79,7 @@ fun AddTaskContent(
                 // Botón para agregar la tarea
                 Button(onClick = {
 
-                   // addTask(Task(description.text, currentDate))
+                   addTask(Task(id = null, description.text,false,date = null))
                     name = TextFieldValue()
                     description = TextFieldValue()
                     navigateToTaskScren()

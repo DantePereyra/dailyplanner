@@ -1,5 +1,6 @@
 package com.dantepereyra.dailyplanner.domain
 
+import androidx.compose.runtime.collectAsState
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -28,7 +29,7 @@ class SharedViewModel @Inject constructor(
 
     private fun loadSelectedDate() {
         viewModelScope.launch {
-            _selectedDate.value = repository.getSelectedDate()
+            repository.getSelectedDateFlow().collect{date -> _selectedDate.value = date }
         }
     }
 

@@ -106,7 +106,8 @@ fun TaskScreen(
         onEditClick = onEditClick,
         catFact = catFact,
         showCatFactDialog = showCatFactDialog, // Pasa el estado al contenido
-        onCatFactClick = onCatFactClick // Pasa la acción para abrir el dialogo
+        onCatFactClick = onCatFactClick,
+        saveDateInSharedPreferences = {date:String -> viewModel.onDateSelected(date)}
 
     )
 }
@@ -120,12 +121,14 @@ fun TaskContent(
     onEditClick: (Task) -> Unit,
     catFact: String,
     showCatFactDialog: MutableState<Boolean>,
-    onCatFactClick: () -> Unit
+    onCatFactClick: () -> Unit,
+    saveDateInSharedPreferences: (String) -> Unit
 ) {
 
     Scaffold(
         topBar = {
-            DailyTopAppBar(onCatFactClick = onCatFactClick)
+            DailyTopAppBar(onCatFactClick = onCatFactClick,
+                saveDateInSharedPreferences = saveDateInSharedPreferences)
             if (showCatFactDialog.value) {
                 WindowFact(catFact = catFact) {
                     showCatFactDialog.value = false // Cambia el estado para cerrar el dialogo
@@ -238,7 +241,8 @@ fun TaskItem(
 
 
 @Composable
-fun DailyTopAppBar(onCatFactClick: () -> Unit) {
+fun DailyTopAppBar(onCatFactClick: () -> Unit,
+                   saveDateInSharedPreferences: (String) ->Unit) {
 
     val context = LocalContext.current
     var currentDate by remember {
@@ -262,7 +266,7 @@ fun DailyTopAppBar(onCatFactClick: () -> Unit) {
                 }
                 currentDate = SimpleDateFormat("dd/MM/yyyy", Locale.US).format(cal.time)
 
-                saveDateInSharedPreferences(context, currentDate)
+                saveDateInSharedPreferences(currentDate)
                 showDatePickerDialog.value = false
             },
             yearMonthDay[2], // Año
@@ -290,6 +294,8 @@ fun DailyTopAppBar(onCatFactClick: () -> Unit) {
         }
     )
 }
+
+
 
 @Composable
 fun DailyBottomAppBar(viewModel: SharedViewModel = hiltViewModel()) {
@@ -329,13 +335,6 @@ fun BackgroundImage() {
     )
 }
 
-fun saveDateInSharedPreferences(context: Context, date: String) {
-    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    with(sharedPreferences.edit()) {
-        putString("selectedDate", date)
-        apply()
-    }
-}
 
 fun getDateFromSharedPreferences(context: Context): String {
     val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)

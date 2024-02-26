@@ -1,6 +1,7 @@
 package com.dantepereyra.dailyplanner.features.task
 
 import android.content.ContentValues
+import android.content.SharedPreferences
 import android.database.sqlite.SQLiteDatabase
 import android.util.Log
 import androidx.compose.material3.AlertDialog
@@ -16,6 +17,7 @@ import com.dantepereyra.dailyplanner.api.FactResponse
 import com.dantepereyra.dailyplanner.bd.TaskDBScheme
 import com.dantepereyra.dailyplanner.bd.taskDB.TaskDAO
 import com.dantepereyra.dailyplanner.bd.taskDB.toDomain
+import com.dantepereyra.dailyplanner.domain.DateRepository
 import com.dantepereyra.dailyplanner.domain.Task
 import com.dantepereyra.dailyplanner.domain.toEntity
 
@@ -36,10 +38,14 @@ import javax.inject.Inject
 class TaskRepository @Inject constructor(
     private val writableDB: SQLiteDatabase,
     private val taskDAO: TaskDAO,
-    private val api: CatsApi
+    private val api: CatsApi,
+    private val dateRepository: DateRepository
 ) {
     fun getTasksDao(): List<Task> = taskDAO.getAll().map { it.toDomain() }
-    fun saveTaskDao(task: Task) = taskDAO.insertAll(task.toEntity())
+    fun saveTaskDao(task: Task) {
+        var date = dateRepository.getSelectedDate().toLong()
+        taskDAO.insertAll(task.toEntity(date))
+    }
     fun markTaskAsCompleted(id: Long) {
 
         taskDAO.markTaskAsCompleted(id)
